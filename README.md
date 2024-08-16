@@ -8,3 +8,7 @@ Siv3Dで書き直し中.
 ゲームプログラミングC++
 [本のリンク](https://www.shoeisha.co.jp/book/detail/9784798157610)
 [Code](https://github.com/gameprogcpp/code)
+
+## Sampling
+色々とサンプリング回りを実装中.  
+* MonteCarlo法での円周率
