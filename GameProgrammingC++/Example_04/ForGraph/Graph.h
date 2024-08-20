@@ -48,3 +48,11 @@ struct AStarScratch
 	bool m_isOpenSet = false;
 	bool m_isClosedSet = false;
 };
+
+struct DijkstraScratch
+{
+	std::shared_ptr<WeightedEdge> m_parentEdge;
+	float m_actualFromStart = 0.0f;
+	bool m_isOpenSet = false;
+	bool m_isClosedSet = false;
+};

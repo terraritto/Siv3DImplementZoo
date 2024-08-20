@@ -4,8 +4,9 @@
 #include "GameGrid.h"
 
 // #define AI_STATE_SAMPLE
-#define AI_GRAPH_SAMPLE
+// #define AI_GRAPH_SAMPLE
 // #define AI_GRID_SAMPLE
+#define AI_TICTACTOE_SAMPLE
 
 #ifdef AI_STATE_SAMPLE
 #include "ForState/Eater.h"
@@ -14,6 +15,10 @@
 
 #ifdef AI_GRAPH_SAMPLE
 #include "ForGraph/SearchGrid.h"
+#endif
+
+#ifdef AI_TICTACTOE_SAMPLE
+#include "ForGraph/TicTacToeBoard.h"
 #endif
 
 Game::Game()
@@ -152,6 +157,13 @@ void Game::processInput()
 	}
 #endif
 
+#ifdef AI_TICTACTOE_SAMPLE
+	if (MouseL.down())
+	{
+		m_board->ProcessClick(Cursor::Pos().x, Cursor::Pos().y);
+	}
+#endif
+
 	m_updatingActors = true;
 	for (auto& actor : m_actorList)
 	{
@@ -238,6 +250,12 @@ void Game::LoadData()
 	auto grid = SpawnCastActor<GameGrid>().lock();
 	grid->Initialize();
 	m_grid = grid;
+#endif
+
+#ifdef AI_TICTACTOE_SAMPLE
+	auto board = SpawnCastActor<TicTacToeBoard>().lock();
+	board->Initialize();
+	m_board = board;
 #endif
 }
 

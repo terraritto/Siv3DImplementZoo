@@ -6,6 +6,7 @@
 class Actor;
 class SpriteComponent;
 class GameGrid;
+class TicTacToeBoard;
 
 class Game : public std::enable_shared_from_this<Game>
 {
@@ -153,4 +154,5 @@ private:
 	bool m_updatingActors; // Actorの更新をしているか？
 
 	std::shared_ptr<GameGrid> m_grid;
+	std::shared_ptr<TicTacToeBoard> m_board;
 };

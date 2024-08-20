@@ -5,6 +5,7 @@
 #include "DFSComponent.h"
 #include "GBFSComponent.h"
 #include "AStarComponent.h"
+#include "DijkstraComponent.h"
 
 SearchGrid::SearchGrid(std::weak_ptr<Game> game)
 	: Actor(game)
@@ -90,6 +91,15 @@ void SearchGrid::UpdateActor(float deltaTime)
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
 		m_graphComponent = CreateCastComponent<AStarComponent>(owner).lock();
+		m_graphComponent->Construct(m_tiles);
+		m_graphComponent->Calculate();
+	}
+
+	if (SimpleGUI::Button(U"Dijkstra!!", { 10, 10 + Offset * 7 }))
+	{
+		auto game = m_game.lock();
+		auto owner = this->shared_from_this();
+		m_graphComponent = CreateCastComponent<DijkstraComponent>(owner).lock();
 		m_graphComponent->Construct(m_tiles);
 		m_graphComponent->Calculate();
 	}

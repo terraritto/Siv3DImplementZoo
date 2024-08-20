@@ -1,14 +1,14 @@
-﻿#include "SearchTile.h"
+﻿#include "TicTacToeTile.h"
 #include "../Game.h"
 
-SearchTile::SearchTile(std::weak_ptr<Game> game)
+TicTacToeTile::TicTacToeTile(std::weak_ptr<Game> game)
 	: Actor(game)
 	, m_sprite()
-	, m_tileState(TileState::Default)
+	, m_tileState(TileState::None)
 {
 }
 
-void SearchTile::Initialize()
+void TicTacToeTile::Initialize()
 {
 	auto game = m_game.lock();
 	auto owner = this->shared_from_this();
@@ -18,13 +18,13 @@ void SearchTile::Initialize()
 	UpdateTexture();
 }
 
-void SearchTile::SetTileState(TileState state)
+void TicTacToeTile::SetTileState(TileState state)
 {
 	m_tileState = state;
 	UpdateTexture();
 }
 
-void SearchTile::UpdateTexture()
+void TicTacToeTile::UpdateTexture()
 {
 	auto game = m_game.lock();
 
@@ -32,32 +32,17 @@ void SearchTile::UpdateTexture()
 
 	switch (m_tileState)
 	{
-	case TileState::Start:
+	case TileState::Square:
 		// blue
 		text = U"🟦";
 		break;
 
-	case TileState::End:
+	case TileState::Cross:
 		// gold
 		text = U"🟨";
 		break;
 
-	case TileState::Searched:
-		//
-		text = U"🟥";
-		break;
-
-	case TileState::FindPath:
-		// green
-		text = U"🟩";
-		break;
-
-	case TileState::Wall:
-		// brown
-		text = U"🟫";
-		break;
-
-	case TileState::Default:
+	case TileState::None:
 	default:
 		// white
 		text = U"⬜";
