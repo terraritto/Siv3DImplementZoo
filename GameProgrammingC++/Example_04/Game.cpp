@@ -270,4 +270,6 @@ void Game::UnloadData()
 		i.second.release();
 	}
 	m_textureMap.clear();
+
+	m_board.reset();
 }

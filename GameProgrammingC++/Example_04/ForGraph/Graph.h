@@ -56,3 +56,21 @@ struct DijkstraScratch
 	bool m_isOpenSet = false;
 	bool m_isClosedSet = false;
 };
+
+enum class GTState
+{
+	None,
+	Square,
+	Cross
+};
+
+struct GTBoard
+{
+	GTState m_board[3][3];
+};
+
+struct GTNode
+{
+	std::vector<std::shared_ptr<GTNode>> m_children;
+	GTBoard m_state;
+};

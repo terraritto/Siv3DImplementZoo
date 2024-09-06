@@ -4,7 +4,7 @@
 TicTacToeTile::TicTacToeTile(std::weak_ptr<Game> game)
 	: Actor(game)
 	, m_sprite()
-	, m_tileState(TileState::None)
+	, m_tileState(GTState::None)
 {
 }
 
@@ -18,7 +18,7 @@ void TicTacToeTile::Initialize()
 	UpdateTexture();
 }
 
-void TicTacToeTile::SetTileState(TileState state)
+void TicTacToeTile::SetTileState(GTState state)
 {
 	m_tileState = state;
 	UpdateTexture();
@@ -32,17 +32,17 @@ void TicTacToeTile::UpdateTexture()
 
 	switch (m_tileState)
 	{
-	case TileState::Square:
+	case GTState::Square:
 		// blue
 		text = U"🟦";
 		break;
 
-	case TileState::Cross:
+	case GTState::Cross:
 		// gold
 		text = U"🟨";
 		break;
 
-	case TileState::None:
+	case GTState::None:
 	default:
 		// white
 		text = U"⬜";

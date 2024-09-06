@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "../Actor.h"
 #include "TicTacToeTile.h"
+#include "GameTreeBaseComponent.h"
 #include <vector>
 
 class TicTacToeBoard : public Actor
@@ -42,7 +43,9 @@ private:
 	const double TileSize = 180.0;
 
 	bool m_isFinished = false;
-	TicTacToeTile::TileState m_tileState;
+	GTState m_tileState;
 
 	Font m_font{ FontMethod::MSDF, 48 };
+
+	std::weak_ptr<GameTreeBaseComponent> m_decide;
 };

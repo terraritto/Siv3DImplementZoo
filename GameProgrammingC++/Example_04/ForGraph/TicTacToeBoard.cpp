@@ -1,4 +1,6 @@
 ﻿#include "TicTacToeBoard.h"
+#include "MinMaxComponent.h"
+#include "AlphaBetaComponent.h"
 
 TicTacToeBoard::TicTacToeBoard(std::weak_ptr<Game> game)
 	: Actor(game)
@@ -28,6 +30,9 @@ void TicTacToeBoard::Initialize()
 		}
 	}
 
+	//m_decide = CreateCastComponent<MinMaxComponent>(this->shared_from_this());
+	m_decide = CreateCastComponent<AlphaBetaComponent>(this->shared_from_this());
+
 	this->m_isFinished = false;
 }
 
@@ -38,10 +43,10 @@ void TicTacToeBoard::UpdateActor(float deltaTime)
 		String winStr;
 		switch (this->m_tileState)
 		{
-		case TicTacToeTile::TileState::Square:
+		case GTState::Square:
 			winStr = U"〇";
 			break;
-		case TicTacToeTile::TileState::Cross:
+		case GTState::Cross:
 			winStr = U"×";
 			break;
 		default:
@@ -77,26 +82,47 @@ void TicTacToeBoard::ProcessClick(int x, int y)
 	}
 
 	CheckGameFinished();
+
+	if (this->m_isFinished == false)
+	{
+		auto decide = m_decide.lock();
+		decide->Construct(m_tiles);
+		auto result = decide->Decide();
+
+		
+		if (result.size() != 0)
+		{
+			for (int i = 0; i < 3; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					m_tiles[i][j]->SetTileState(result[i][j]);
+				}
+			}
+		}
+
+		CheckGameFinished();
+	}
 }
 
 void TicTacToeBoard::SelectTile(int row, int col)
 {
-	auto tileState = m_tiles[row][col]->GetTileState();
+	auto GTState = m_tiles[row][col]->GetTileState();
 
-	if (tileState == TicTacToeTile::TileState::None)
+	if (GTState == GTState::None)
 	{
-		m_tiles[row][col]->SetTileState(TicTacToeTile::TileState::Square);
+		m_tiles[row][col]->SetTileState(GTState::Square);
 	}
 }
 
 void TicTacToeBoard::CheckGameFinished()
 {
-	auto StateCheck = [&](TicTacToeTile::TileState a, TicTacToeTile::TileState b, TicTacToeTile::TileState c)
+	auto StateCheck = [&](GTState a, GTState b, GTState c)
 		{
 
 			if (a == b && b == c && c == a)
 			{
-				if (a == TicTacToeTile::TileState::None) { return false; }
+				if (a == GTState::None) { return false; }
 
 				this->m_tileState = a;
 				return true;
