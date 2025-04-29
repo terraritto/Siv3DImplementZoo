@@ -108,8 +108,10 @@ void CannyEdgeDetectorSample()
 					GradientImage[h][w] = Color(r, r, r);
 
 					// atan2(G_y,G_x)
-					uint8 theta = Atan2(Y.x, X.x) / Math::Pi * 180; // [-pi, pi]->[-180, 180]
-					DirectionImage[h][w] = { Color(theta, theta, theta, (Sign(result.x) > 0 ? 0 : 1)) };
+					int theta = Atan2(Y.x, X.x) / Math::Pi * 180; // [-pi, pi]->[-180, 180]
+					int sign = Sign(result.x);
+					int t_pos = theta * sign;
+					DirectionImage[h][w] = { Color(t_pos, t_pos, t_pos, sign > 0 ? 1 : 0) };
 				};
 
 			auto NonMaximumSuprresionProcess = [&](int w, int h)
