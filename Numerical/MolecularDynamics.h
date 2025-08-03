@@ -35,7 +35,9 @@ void MolecularDynamicsSample()
 	Array<Vec3> particleVelocities;
 	for (int i = 0; i < particlePositions.size(); i++)
 	{
-		auto v = Sqrt(-2.0 * T * Log(RandomVec3())) * Cos(Math::TwoPi * RandomVec3());
+		auto r1 = RandomVec3(); r1.x = Abs(r1.x); r1.y = Abs(r1.y); r1.z = Abs(r1.z);
+		auto r2 = RandomVec3(); r2.x = Abs(r2.x); r2.y = Abs(r2.y); r2.z = Abs(r2.z);
+		auto v = Sqrt(-2.0 * T * Log(r1)) * Cos(Math::TwoPi * r2);
 		particleVelocities.push_back(v);
 	}
 
@@ -54,11 +56,26 @@ void MolecularDynamicsSample()
 				{
 					// 二点間の差と距離を算出
 					Vec3 diff = particlePositions[i] - particlePositions[j];
-					double distance = particlePositions[i].distanceFromSq(particlePositions[j]);
+
+					// 各軸での境界計算
+					auto AdjustSign = [](double& dist, float L)
+						{
+							if (Abs(dist) > 0.5 * L)
+							{
+								// 境界のL/2を超えてたら、逆方向になるように
+								// 境界を調整する
+								dist -= Sign(dist) * L;
+							}
+						};
+					AdjustSign(diff.x, L);
+					AdjustSign(diff.y, L);
+					AdjustSign(diff.z, L);
+
+					double distance = Sqrt(diff.dot(diff));
 
 					// 力を計算
-					double sr2 = 1 / distance;
-					double ijForce = 24.0 * (2.0 * Pow(sr2, 13) - Pow(sr2, 7));
+					double sr = 1 / distance;
+					double ijForce = 24.0 * (2.0 * Pow(sr, 13) - Pow(sr, 7));
 					Vec3 fx = ijForce * diff;
 
 					// i側に適用(直接ではない)
@@ -75,10 +92,54 @@ void MolecularDynamicsSample()
 			return forceList;
 		};
 
-	auto forecList = CalculateForce();
+	auto forceList = CalculateForce();
 
+	constexpr double h = 0.001;
+	constexpr double h2 = h * 0.5;
+	constexpr double hsq = h * h;
+
+	int count = 0;
 	while (System::Update())
 	{
+		// 更新
+		{
+			// 速度ベルレ法で計算していく
+			for (int i = 0; auto& position : particlePositions)
+			{
+				// r(t+h) = r(t) + v(t)h + F(t)/(2m)*h^2
+				position = position + h * particleVelocities[i] +
+					forceList[i] * 0.5 * hsq;
+
+				// 境界条件
+				auto Boundary = [](double& pos, double L)
+					{
+						if (Abs(pos) > L * 0.5)
+						{
+							pos -= Sign(pos) * L;
+						}
+					};
+				Boundary(position.x, L);
+				Boundary(position.y, L);
+				Boundary(position.z, L);
+
+				// v_d = v(t) + F(t)/(2m)*h
+				particleVelocities[i] += h2 * forceList[i];
+
+				i++;
+			}
+
+			// 強さを更新
+			forceList.clear();
+			forceList = CalculateForce();
+
+			for (int i = 0; auto& velocity : particleVelocities)
+			{
+				// v(t+h) = v_d + F(t+h)/(2m)*h
+				velocity += h2 * forceList[i];
+				i++;
+			}
+		}
+
 		camera.update(2.0);
 		Graphics3D::SetCameraTransform(camera);
 
@@ -99,6 +160,20 @@ void MolecularDynamicsSample()
 			Graphics3D::Flush();
 			renderTexture.resolve();
 			Shader::LinearToScreen(renderTexture);
+
+			double k = 0.0;
+			for (auto& v : particleVelocities)
+			{
+				k += v.dot(v);
+			}
+			k = k / particleNum;
+			double T = k / (3.0 * particleNum);
+
+
+			ClearPrint();
+			Print << U"温度: " << T;
+			Print << U"試行回数: " << count;
+			count++;
 		}
 	}
 }
