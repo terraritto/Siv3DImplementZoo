@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
+#include "../Shader/ShaderBase.h"
 
 namespace TerakoyaRenderer
 {

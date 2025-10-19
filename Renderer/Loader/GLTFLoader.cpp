@@ -1,5 +1,4 @@
 ﻿#include "GLTFLoader.h"
-#include "../RenderManager.h"
 #include "../Common/Mesh.h"
 #include "../Common/Model.h"
 #include "../Common/Primitive.h"
@@ -8,12 +7,12 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#define TINYGLTF_IMPLEMENTATION
-#include "tiny_gltf.h"
+//#define TINYGLTF_IMPLEMENTATION
+#include "./tiny_gltf.h"
 
 namespace TerakoyaRenderer
 {
-	bool GLTFLoader::Load(String path)
+	bool GLTFLoader::Load(String path, std::weak_ptr<RenderAppBase> app)
 	{
 		tinygltf::Model model;
 		tinygltf::TinyGLTF loader;
@@ -27,7 +26,7 @@ namespace TerakoyaRenderer
 			return false;
 		}
 
-		std::shared_ptr<RenderManager> renderManager = RenderManager::GetInstance().lock();
+		std::shared_ptr<RenderAppBase> renderManager = app.lock();
 		std::shared_ptr<Model> renderModel = renderManager->CreateModel().lock();
 
 		// Meshの生成
@@ -48,7 +47,7 @@ namespace TerakoyaRenderer
 				auto& positionBufferView = model.bufferViews[positionAccessor.bufferView];
 				auto& positionBuffer = model.buffers[positionBufferView.buffer];
 				const float* positions = reinterpret_cast<const float*>(&positionBuffer.data[positionBufferView.byteOffset + positionAccessor.byteOffset]);
-				for (unsigned long long i = 0; i < positionAccessor.count; ++i)
+				for (int i = 0; i < positionAccessor.count; ++i)
 				{
 					int index = i * 3 + 0;
 					renderPrimitive->AddVertex(positions[index], positions[index + 1], positions[index + 2]);

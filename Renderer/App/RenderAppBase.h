@@ -9,30 +9,11 @@ namespace TerakoyaRenderer
 	class IDrawMethod;
 	enum class EDrawMethod;
 
-	class RenderManager
+	class RenderAppBase : public std::enable_shared_from_this<RenderAppBase>
 	{
 	public:
-		RenderManager();
-		~RenderManager();
-
-		// 提供関係
-		static std::weak_ptr<RenderManager> GetInstance()
-		{
-			return m_instance;
-		}
-
-		static void Create()
-		{
-			if (!m_instance)
-			{
-				m_instance = std::make_shared<RenderManager>();
-			}
-		}
-
-		static void Destroy()
-		{
-			m_instance.reset();
-		}
+		RenderAppBase();
+		~RenderAppBase();
 
 	public:
 		std::weak_ptr<Model> CreateModel();
@@ -41,12 +22,20 @@ namespace TerakoyaRenderer
 		std::weak_ptr<Camera> GetCamera() { return m_camera; }
 		void SetDrawMethod(const EDrawMethod drawMethod);
 
-		void Render();
+		virtual void Prepare() = 0;
+		virtual void Render() = 0;
 		void Draw();
 
-	private:
-		static std::shared_ptr<RenderManager> m_instance;
+		virtual void Destroy();
 
+	protected:
+		// 頂点が範囲内かの判定
+		bool IsCorrectRegionVertex(const int width, const int height, const Vec2& v);
+
+		// Point/Lineの描画処理
+		void SpecialDrawMethodProcess(const Array<Vec4>& tempVertices, const Array<unsigned int>& tempIndices);
+
+	protected:
 		// 保有するモデル情報
 		Array<std::shared_ptr<Model>> m_modelList;
 
