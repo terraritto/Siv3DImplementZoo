@@ -15,6 +15,9 @@ namespace TerakoyaRenderer
 		void SetFar(float far) { m_far = far; CalculateProjMatrix(); }
 		void SetFov(float fov) { m_fov = fov; CalculateProjMatrix(); }
 
+		const Vec3 GetOrigin() const { return m_origin; }
+		const float GetFov() const { return m_fov; }
+
 		Mat4x4 GetViewMatrix() const { return m_viewMatrix; }
 		Mat4x4 GetProjMatrix() const { return m_projMatrix; }
 

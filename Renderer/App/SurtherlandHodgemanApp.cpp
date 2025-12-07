@@ -1,6 +1,4 @@
 ﻿#include "SurtherlandHodgemanApp.h"
-
-#include "SurtherlandHodgemanApp.h"
 #include "../Common/Camera.h"
 #include "../Common/Mesh.h"
 #include "../Common/Model.h"
@@ -21,8 +19,11 @@ namespace TerakoyaRenderer
 
 		SetDrawMethod(TerakoyaRenderer::EDrawMethod::Fill);
 
-		m_camera->SetOrigin(Vec3{ -0.5f, 0.3f, 0.0f });
+		m_camera->SetOrigin(Vec3{ 0.7f, 0.2f, 0.0f });
 		m_camera->SetLookAt(Vec3::Zero());
+		m_camera->SetUp(Vec3::Up());
+		m_camera->SetNear(0.00001);
+		m_camera->SetFar(1000);
 
 		m_vertexShader = std::make_unique<TestVertexShader>();
 
@@ -173,6 +174,7 @@ namespace TerakoyaRenderer
 				}
 			}
 			*/
+
 			// Pattern2: Surtherland-Hodgemanによるクリッピング
 			{
 				bool isIncorrectRegion =

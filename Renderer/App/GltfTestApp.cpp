@@ -19,8 +19,11 @@ namespace TerakoyaRenderer
 
 		SetDrawMethod(TerakoyaRenderer::EDrawMethod::Point);
 
-		m_camera->SetOrigin(Vec3{ -0.5f, 0.3f, 0.0f });
+		m_camera->SetOrigin(Vec3{ 0.7f, 0.2f, 0.0f });
 		m_camera->SetLookAt(Vec3::Zero());
+		m_camera->SetUp(Vec3::Up());
+		m_camera->SetNear(0.00001);
+		m_camera->SetFar(1000);
 	}
 
 	void GltfTestApp::Render()
@@ -81,11 +84,12 @@ namespace TerakoyaRenderer
 						auto tempV = DirectX::XMVector4Transform(DirectX::XMVectorSet(vert.x, vert.y, vert.z, vert.w), worldMatrix);
 						tempWorldVertices[i] = Vec4{ tempV.m128_f32[0], tempV.m128_f32[1],tempV.m128_f32[2],tempV.m128_f32[3] };
 						tempV = DirectX::XMVector4Transform(tempV, viewMatrix.transposed());
-						tempV = DirectX::XMVector4Transform(tempV, projMatrix.transposed());
+						tempV = DirectX::XMVector4Transform(tempV, projMatrix);
 						// 正規化デバイス座標へ
-						tempV.m128_f32[0] = tempV.m128_f32[0] / tempV.m128_f32[3];
-						tempV.m128_f32[1] = tempV.m128_f32[1] / tempV.m128_f32[3];
-						tempV.m128_f32[2] = tempV.m128_f32[2] / tempV.m128_f32[3];
+						float w = Abs(tempV.m128_f32[3]);
+						tempV.m128_f32[0] = tempV.m128_f32[0] / w;
+						tempV.m128_f32[1] = tempV.m128_f32[1] / w;
+						tempV.m128_f32[2] = tempV.m128_f32[2] / w;
 						tempV.m128_f32[3] = 1.0f;
 
 						tempV = DirectX::XMVector4Transform(tempV, viewportMat.transposed());

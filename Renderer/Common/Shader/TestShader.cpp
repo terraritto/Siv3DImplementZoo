@@ -18,12 +18,13 @@ namespace TerakoyaRenderer
 		Vec4 vert{ input->position, 1.0f };
 		auto tempV = DirectX::XMVector4Transform(DirectX::XMVectorSet(vert.x, vert.y, vert.z, vert.w), input->worldMatrix);
 		tempV = DirectX::XMVector4Transform(tempV, input->viewMatrix.transposed());
-		tempV = DirectX::XMVector4Transform(tempV, input->projectionMatrix.transposed());
+		tempV = DirectX::XMVector4Transform(tempV, input->projectionMatrix);
 
 		// 正規化デバイス座標へ
-		tempV.m128_f32[0] = tempV.m128_f32[0] / tempV.m128_f32[3];
-		tempV.m128_f32[1] = tempV.m128_f32[1] / tempV.m128_f32[3];
-		tempV.m128_f32[2] = tempV.m128_f32[2] / tempV.m128_f32[3];
+		auto z = Abs(tempV.m128_f32[3]);
+		tempV.m128_f32[0] = tempV.m128_f32[0] / z;
+		tempV.m128_f32[1] = tempV.m128_f32[1] / z;
+		tempV.m128_f32[2] = tempV.m128_f32[2] / z;
 		tempV.m128_f32[3] = 1.0f;
 
 		// viewport座標へ

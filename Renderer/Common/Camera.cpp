@@ -8,7 +8,7 @@ namespace TerakoyaRenderer
 		, m_lookAt(Vec3::Forward())
 		, m_near(0.0f)
 		, m_far(10000.0f)
-		, m_fov(Math::Pi / 6.0f)
+		, m_fov(Math::Pi / 3.0f)
 		, m_viewMatrix(Mat4x4::Identity())
 		, m_projMatrix(Mat4x4::Identity())
 	{
@@ -45,13 +45,13 @@ namespace TerakoyaRenderer
 	{
 		// @todo: SceneSizeに関しては必要であればパラメータを分ける
 		float aspect = Scene::Size().x / static_cast<float>(Scene::Size().y);
-		float f = Cos(m_fov) / Sin(m_fov);
+		float f = 1.0 / Tan(m_fov * 0.5);
 		m_projMatrix = Mat4x4::Set
 		(
-			f / aspect, 0, 0, 0,
-			0, f, 0, 0,
-			0, 0, -(m_far + m_near) / (m_far - m_near), -(2.0 * m_near * m_far) / (m_far - m_near),
-			0, 0, -1.0, 0
+			f, 0, 0, 0,
+			0, f * aspect, 0, 0,
+			0, 0, (m_far + m_near) / (m_far - m_near), -1.0,
+			0, 0, (2.0 * m_near * m_far) / (m_far - m_near), 0
 		);
 	}
 }
