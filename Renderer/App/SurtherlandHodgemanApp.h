@@ -1,6 +1,4 @@
 ﻿#pragma once
-
-#pragma once
 #include "RenderAppBase.h"
 #include "../Common/Shader/TestShader.h"
 
