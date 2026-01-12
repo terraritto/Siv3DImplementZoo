@@ -4,6 +4,7 @@
 #include "../Common/Primitive.h"
 #include "../Common/Scene.h"
 #include "../Common/SceneNode.h"
+#include "../Common/Vertex.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -40,17 +41,29 @@ namespace TerakoyaRenderer
 
 				// 各種Indexを取得
 				auto& positionIndex = primitive.attributes["POSITION"];
+				auto& normalIndex = primitive.attributes["NORMAL"];
 				auto& indicesIndex = primitive.indices;
 
-				// positionの取得
+				// データ取得
 				auto& positionAccessor = model.accessors[positionIndex];
 				auto& positionBufferView = model.bufferViews[positionAccessor.bufferView];
 				auto& positionBuffer = model.buffers[positionBufferView.buffer];
 				const float* positions = reinterpret_cast<const float*>(&positionBuffer.data[positionBufferView.byteOffset + positionAccessor.byteOffset]);
+
+				auto& normalAccessor = model.accessors[normalIndex];
+				auto& normalBufferView = model.bufferViews[normalAccessor.bufferView];
+				auto& normalBuffer = model.buffers[normalBufferView.buffer];
+				const float* normals = reinterpret_cast<const float*>(&normalBuffer.data[normalBufferView.byteOffset + normalAccessor.byteOffset]);
+
 				for (int i = 0; i < positionAccessor.count; ++i)
 				{
 					int index = i * 3 + 0;
-					renderPrimitive->AddVertex(positions[index], positions[index + 1], positions[index + 2]);
+					auto vertex = std::make_shared<Vertex>();
+					vertex->m_position = Vec3{ positions[index], positions[index + 1], positions[index + 2] };
+					vertex->m_normal = normalAccessor.normalized ?
+						Vec3{ normals[index], normals[index + 1], normals[index + 2] } :
+						Vec3{ normals[index], normals[index + 1], normals[index + 2] }.normalized();
+					renderPrimitive->AddVertex(vertex);
 				}
 
 				// indexの取得

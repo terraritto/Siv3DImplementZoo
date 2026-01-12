@@ -9,6 +9,11 @@ namespace TerakoyaRenderer
 		m_vertices.push_back(vertex);
 	}
 
+	void Primitive::AddVertex(std::shared_ptr<Vertex> vertex)
+	{
+		m_vertices.push_back(vertex);
+	}
+
 	void TerakoyaRenderer::Primitive::AddIndex(unsigned int index)
 	{
 		m_indices.push_back(index);
