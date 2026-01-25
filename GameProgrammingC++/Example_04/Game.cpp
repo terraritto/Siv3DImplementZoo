@@ -4,9 +4,9 @@
 #include "GameGrid.h"
 
 // #define AI_STATE_SAMPLE
-// #define AI_GRAPH_SAMPLE
+#define AI_GRAPH_SAMPLE
 // #define AI_GRID_SAMPLE
-#define AI_TICTACTOE_SAMPLE
+// #define AI_TICTACTOE_SAMPLE
 
 #ifdef AI_STATE_SAMPLE
 #include "ForState/Eater.h"

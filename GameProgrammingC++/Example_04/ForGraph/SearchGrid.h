@@ -25,6 +25,13 @@ protected:
 	// 壁を消す
 	void WallPenetrate();
 
+	// 壁をリセット
+	void WallClear();
+
+	// 終了があるかの判定
+	[[nodiscard]]
+	bool IsEndExist() const;
+
 	// 座標(x,y)を掘る
 	void Dig(int x, int y);
 
@@ -68,4 +75,7 @@ private:
 
 	// Tileのサイズ
 	const double TileSize = 10.0;
+
+	// 重み
+	double m_weight = 1.0;
 };

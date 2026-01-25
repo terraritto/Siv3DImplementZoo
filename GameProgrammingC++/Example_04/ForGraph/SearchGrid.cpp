@@ -6,6 +6,7 @@
 #include "GBFSComponent.h"
 #include "AStarComponent.h"
 #include "DijkstraComponent.h"
+#include "WeightedAStarComponent.h"
 
 SearchGrid::SearchGrid(std::weak_ptr<Game> game)
 	: Actor(game)
@@ -58,8 +59,59 @@ void SearchGrid::UpdateActor(float deltaTime)
 		WallPenetrate();
 	}
 
+	// 壁貫通ボタン
+	if (SimpleGUI::Button(U"Clear", { 10, 10 + Offset * 3 }))
+	{
+		WallClear();
+	}
+
+	// 確率
+	SimpleGUI::Slider(m_weight, 0, 3, { 10, 10 + Offset * 4 });
+
+	// Endが追加されていない場合は何もしない
+	if (IsEndExist() == false)
+	{
+		return;
+	}
+
+	if (SimpleGUI::Button(U"Dijkstra!!", { 10, 10 + Offset * 5 }))
+	{
+		auto game = m_game.lock();
+		auto owner = this->shared_from_this();
+		m_graphComponent = CreateCastComponent<DijkstraComponent>(owner).lock();
+		m_graphComponent->Construct(m_tiles);
+		m_graphComponent->Calculate();
+	}
+
+	if (SimpleGUI::Button(U"Weighted A*", { 10, 10 + Offset * 6 }))
+	{
+		auto game = m_game.lock();
+		auto owner = this->shared_from_this();
+		auto component = CreateCastComponent<WeightedAStarComponent>(owner).lock();
+		component->SetWeight(m_weight);
+		m_graphComponent = component;
+		m_graphComponent->Construct(m_tiles);
+		m_graphComponent->Calculate();
+	}
+
+	int count = 0;
+	for (auto& tiles : m_tiles)
+	{
+		for (auto& tile : tiles)
+		{
+			if (SearchTile::TileState::FindPath == tile->GetTileState())
+			{
+				count++;
+			}
+		}
+	}
+
+
+	PutText(U"PathCount: " + Format(count), {30, 10 + Offset * 7});
+
+	/*
 	// 探索開始
-	if (SimpleGUI::Button(U"BFS!!", { 10, 10 + Offset * 3 }))
+	if (SimpleGUI::Button(U"BFS!!", { 10, 10 + Offset * 4 }))
 	{
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
@@ -68,7 +120,7 @@ void SearchGrid::UpdateActor(float deltaTime)
 		m_graphComponent->Calculate();
 	}
 
-	if (SimpleGUI::Button(U"DFS!!", { 10, 10 + Offset * 4 }))
+	if (SimpleGUI::Button(U"DFS!!", { 10, 10 + Offset * 5 }))
 	{
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
@@ -77,7 +129,7 @@ void SearchGrid::UpdateActor(float deltaTime)
 		m_graphComponent->Calculate();
 	}
 
-	if (SimpleGUI::Button(U"GBFS!!", { 10, 10 + Offset * 5 }))
+	if (SimpleGUI::Button(U"GBFS!!", { 10, 10 + Offset * 6 }))
 	{
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
@@ -86,7 +138,7 @@ void SearchGrid::UpdateActor(float deltaTime)
 		m_graphComponent->Calculate();
 	}
 
-	if (SimpleGUI::Button(U"AStar!!", { 10, 10 + Offset * 6 }))
+	if (SimpleGUI::Button(U"AStar!!", { 10, 10 + Offset * 7 }))
 	{
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
@@ -95,7 +147,7 @@ void SearchGrid::UpdateActor(float deltaTime)
 		m_graphComponent->Calculate();
 	}
 
-	if (SimpleGUI::Button(U"Dijkstra!!", { 10, 10 + Offset * 7 }))
+	if (SimpleGUI::Button(U"Dijkstra!!", { 10, 10 + Offset * 8 }))
 	{
 		auto game = m_game.lock();
 		auto owner = this->shared_from_this();
@@ -103,6 +155,7 @@ void SearchGrid::UpdateActor(float deltaTime)
 		m_graphComponent->Construct(m_tiles);
 		m_graphComponent->Calculate();
 	}
+	*/
 }
 
 void SearchGrid::MakeGrid()
@@ -180,6 +233,45 @@ void SearchGrid::WallPenetrate()
 		auto tile = wallTiles[Random<int>(0, wallTiles.size() - 1)];
 		tile->SetTileState(SearchTile::TileState::Default);
 	}
+}
+
+void SearchGrid::WallClear()
+{
+	for (auto& tiles : m_tiles)
+	{
+		for (auto& tile : tiles)
+		{
+			if (tile->GetTileState() == SearchTile::TileState::Searched)
+			{
+				tile->SetTileState(SearchTile::TileState::Default);
+			}
+
+			switch (tile->GetTileState())
+			{
+			case SearchTile::TileState::Searched:
+			case SearchTile::TileState::FindPath:
+				tile->SetTileState(SearchTile::TileState::Default);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
+bool SearchGrid::IsEndExist() const
+{
+	for (auto& tiles : m_tiles)
+	{
+		for (auto& tile : tiles)
+		{
+			if (tile->GetTileState() == SearchTile::TileState::End)
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void SearchGrid::Dig(int x, int y)
