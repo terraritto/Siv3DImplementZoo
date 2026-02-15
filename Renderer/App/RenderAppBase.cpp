@@ -22,7 +22,7 @@ namespace TerakoyaRenderer
 	{
 	}
 
-	std::weak_ptr<Model> TerakoyaRenderer::RenderAppBase::CreateModel()
+	std::weak_ptr<Model> RenderAppBase::CreateModel()
 	{
 		std::shared_ptr<Model> model = std::make_shared<Model>();
 		m_modelList.push_back(model);
@@ -41,6 +41,7 @@ namespace TerakoyaRenderer
 
 	void RenderAppBase::Destroy()
 	{
+		m_modelList.clear();
 	}
 
 	bool RenderAppBase::IsCorrectRegionVertex(const int width, const int height, const Vec2& v)

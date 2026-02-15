@@ -15,5 +15,6 @@ namespace TerakoyaRenderer
 	Vertex::Vertex()
 		: m_position(Vec3::Zero())
 		, m_normal(Vec3::Up())
+		, m_uv0(Vec2::Zero())
 	{ }
 }

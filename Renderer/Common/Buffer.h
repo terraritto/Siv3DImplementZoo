@@ -6,7 +6,7 @@ namespace TerakoyaRenderer
 	class DepthBuffer
 	{
 	public:
-		DepthBuffer(int width, int height, double init = 0.0)
+		DepthBuffer(int width, int height)
 		{
 			m_data.resize(height);
 			for (auto& data : m_data) { data.resize(width, std::numeric_limits<double>::lowest()); }

@@ -49,7 +49,6 @@ namespace TerakoyaRenderer::RemovalFace
 		auto input = std::static_pointer_cast<RemovalFacePixelInput>(m_input);
 
 		double NoL = Abs(Dot(-input->directionalLight, input->normal));
-		(*m_image)[input->screenPos.y][input->screenPos.x]
-			= ColorF({ NoL * input->lightColor,1.0 });
+		(*m_image)[input->screenPos.y][input->screenPos.x] = ColorF({ NoL * input->lightColor,1.0 });
 	}
 }

@@ -13,5 +13,6 @@ namespace TerakoyaRenderer
 		// 位置情報
 		Vec3 m_position;
 		Vec3 m_normal;
+		Vec2 m_uv0;
 	};
 }
