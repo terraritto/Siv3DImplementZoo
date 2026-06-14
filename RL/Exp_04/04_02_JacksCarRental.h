@@ -68,7 +68,8 @@ void JacksCarRental()
 					firstLocation -= validRentalFirstLocation;
 					secondLocation -= validRentalSecondLocation;
 
-					// 返却時の車
+					// 返却時の車(固定計算)
+					/*
 					{
 						double returnedFirstLocation = RETURN_FIRST_LOCATION;
 						double returnedSecondLocation = RETURN_SECOND_LOCATION;
@@ -83,10 +84,10 @@ void JacksCarRental()
 						// ベルマン方程式でリターンを計算
 						returnValue += probability * (reward + DISCOUNT * currentValue[firstLocation * (MAX_CARS + 1) + secondLocation]);
 					}
+					*/
 
 					// returnもprobに従うように計算してみるver.
 					// 激重注意
-					/*
 					{
 						for (int returnedFirst = 0; returnedFirst < POISSON_UPPER_BOUND; returnedFirst++)
 						{
@@ -105,11 +106,12 @@ void JacksCarRental()
 								returnedSecondLocation = Min(returnedSecondLocation, static_cast<int>(MAX_CARS));
 
 								// ベルマン方程式でリターンを計算
-								returnValue += returnProbability * (reward + DISCOUNT * currentValue[returnedFirstLocation * (MAX_CARS + 1) + returnedSecondLocation]);
+								returnValue += returnProbability * (reward
+									+ DISCOUNT * currentValue
+									[returnedFirstLocation * (MAX_CARS + 1) + returnedSecondLocation]);
 							}
 						}
 					}
-					*/
 				}
 			}
 
@@ -173,7 +175,9 @@ void JacksCarRental()
 					}
 				}
 
-				int newAction = actions[std::distance(actionReturns.begin(), std::max_element(actionReturns.begin(), actionReturns.end()))];
+				int newAction =
+					actions[std::distance(actionReturns.begin(),
+						std::max_element(actionReturns.begin(), actionReturns.end()))];
 				policies[index] = newAction;
 
 				if (isPolicyStable && oldAction != newAction)
@@ -186,7 +190,6 @@ void JacksCarRental()
 
 		if (isPolicyStable)
 		{
-			results.push_back(values);
 			break;
 		}
 	}
@@ -199,17 +202,13 @@ void JacksCarRental()
 	constexpr double GRID_OFFSET_SIZE = GRID_SIZE + GRID_OFFSET;
 	const Font font{ FontMethod::MSDF, 18, Typeface::Bold };
 
-	constexpr double maxPolicyPrev = 1.0;
-	constexpr double minPolicyPrev = -1.0;
-	constexpr double maxPolicyLast = 640.0;
-	constexpr double minPolicyLast = 440.0;
 
 	while (System::Update())
 	{
 		auto& value = results[index];
 
-		double maxPolicy = index == results.size() - 1 ? maxPolicyLast : maxPolicyPrev;
-		double minPolicy = index == results.size() - 1 ? minPolicyLast : minPolicyPrev;
+		double maxPolicy = 4.0;
+		double minPolicy = -4.0;
 
 		for (int i = 0; i < MAX_CARS + 1; i++)
 		{
