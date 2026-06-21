@@ -6,9 +6,9 @@ void GamblersProblem()
 	constexpr int GOAL = 100;
 	constexpr double HEAD_PROBABILITY = 0.4;
 
-	// 全ての状態: [0,100]
+	// 全ての状態: [0,99]
 	Array<int> states;
-	for (int value = 1; value <= GOAL; value++)
+	for (int value = 1; value < GOAL; value++)
 	{
 		states.push_back(value);
 	}
@@ -28,7 +28,7 @@ void GamblersProblem()
 			// 可能な行動を生成
 			Array<int> actions;
 			int minAction = Min(state, GOAL - state);
-			for (int value = 0; value <= minAction; value++)
+			for (int value = 1; value <= minAction; value++)
 			{
 				actions.push_back(value);
 			}
@@ -69,7 +69,7 @@ void GamblersProblem()
 		// 可能な行動を生成
 		Array<int> actions;
 		int minAction = Min(state, GOAL - state);
-		for (int value = 0; value <= minAction; value++)
+		for (int value = 1; value <= minAction; value++)
 		{
 			actions.push_back(value);
 		}
@@ -90,11 +90,10 @@ void GamblersProblem()
 				return Round(value * p) / p;
 			};
 
-		returns.pop_front();
 		std::for_each(returns.begin(), returns.end(), [&](double& value) { value = RoundN(value, 5); });
 		auto maxElement = std::max_element(returns.begin(), returns.end());
 		auto distance = std::distance(returns.begin(), maxElement);
-		policies[state] = actions[distance + 1];
+		policies[state] = actions[distance];
 	}
 
 	bool isSwap = false;
