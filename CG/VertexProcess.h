@@ -1,6 +1,4 @@
 ﻿#pragma once
-
-#pragma once
 #include "Siv3D.hpp"
 
 void LoadObj(String filePath, Array<Vec4>& vertices)
@@ -63,12 +61,12 @@ void VertexProcessSmaple()
 	double near = -1.0, fov = Math::Pi / 6.0;
 	double aspect = Scene::Size().x / static_cast<double>(Scene::Size().y);
 	double far = 10.0;
-	double f = Cos(fov)/Sin(fov);
+	double f = Cos(fov) / Sin(fov);
 	Mat4x4 perspectiveMat = Mat4x4::Set
 	(
-		f/aspect, 0, 0, 0,
+		f / aspect, 0, 0, 0,
 		0, f, 0, 0,
-		0, 0, -(far + near) / (far - near), -(2.0 * near * far) / (far - near),
+		0, 0, (far + near) / (far - near), (2.0 * near * far) / (far - near),
 		0, 0, -1.0, 0
 	);
 
@@ -86,7 +84,7 @@ void VertexProcessSmaple()
 
 	for (auto& v : vertices)
 	{
-		auto tempV = DirectX::XMVector4Transform(DirectX::XMVectorSet(v.x,v.y,v.z,v.w), worldMatrix);
+		auto tempV = DirectX::XMVector4Transform(DirectX::XMVectorSet(v.x, v.y, v.z, v.w), worldMatrix);
 		tempV = DirectX::XMVector4Transform(tempV, viewMat.transposed());
 		tempV = DirectX::XMVector4Transform(tempV, perspectiveMat.transposed());
 		// 正規化デバイス座標へ
