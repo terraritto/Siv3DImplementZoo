@@ -155,7 +155,7 @@ void HiddenSurfaceRemovalNormalSmaple()
 	(
 		f / aspect, 0, 0, 0,
 		0, f, 0, 0,
-		0, 0, -(far + near) / (far - near), -(2.0 * near * far) / (far - near),
+		0, 0, (far + near) / (far - near), (2.0 * near * far) / (far - near),
 		0, 0, -1.0, 0
 	);
 
@@ -171,9 +171,11 @@ void HiddenSurfaceRemovalNormalSmaple()
 	float wx = Scene::Size().x / 2.0f, ox = 0.0f;
 	float wy = Scene::Size().y / 2.0f, oy = 0.0f;
 
+	Array<Vec4> worldPositions;
 	for (auto& v : vertices)
 	{
 		auto tempV = DirectX::XMVector4Transform(DirectX::XMVectorSet(v.x, v.y, v.z, v.w), worldMatrix);
+		worldPositions.push_back(Vec4{ tempV.m128_f32[0], tempV.m128_f32[1],tempV.m128_f32[2],tempV.m128_f32[3] });
 		tempV = DirectX::XMVector4Transform(tempV, viewMat.transposed());
 		tempV = DirectX::XMVector4Transform(tempV, perspectiveMat.transposed());
 		// 正規化デバイス座標へ
@@ -198,9 +200,14 @@ void HiddenSurfaceRemovalNormalSmaple()
 		const Vec4& v2 = vertices[polygon.elem(1)];
 		const Vec4& v3 = vertices[polygon.elem(2)];
 
+		const Vec4& p1 = worldPositions[polygon.elem(0)];
+		const Vec4& p2 = worldPositions[polygon.elem(1)];
+		const Vec4& p3 = worldPositions[polygon.elem(2)];
+
 		Vec3 meshNormal =
-			Cross((v2 - v1).normalize().xyz(), (v3 - v1).normalize().xyz());
-		Vec3 cameraRay = (lookPoint - origin).normalize();
+			Cross((p2 - p1).normalize().xyz(), (p3 - p1).normalize().xyz());
+		Vec4 point = (p1 + p2 + p3) / 3.0;
+		Vec3 cameraRay = (point.xyz() - origin).normalize();
 		if (Dot(meshNormal, cameraRay) > 0.0)
 		{
 			continue;
