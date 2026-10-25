@@ -25,7 +25,7 @@ namespace TerakoyaRenderer::Shading
 		m_camera->SetNear(0.00001);
 		m_camera->SetFar(1000);
 
-		m_lightDir = Vec3{ 0.8, -0.5, 0.3 }.normalized();
+		m_lightDir = Vec3{ 0.0, -0.5, -0.9 }.normalized();
 		m_lightColor = Vec3::One() * 0.8;
 
 		m_depthBuffer = std::make_unique<DepthBuffer>(::Scene::Size().x, ::Scene::Size().y);

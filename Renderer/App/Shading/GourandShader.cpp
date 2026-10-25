@@ -37,8 +37,16 @@ namespace TerakoyaRenderer::Shading
 
 		// ライトの計算をWorld空間でしておく
 		Vec4 normal{ input->normal, 1.0f };
-		auto tempN = DirectX::XMVector4Transform(DirectX::XMVectorSet(normal.x, normal.y, normal.z, normal.w), input->worldMatrix);
-		double NoL = Abs(Dot(-input->directionalLight, Vec3{ tempN.m128_f32[0], tempN.m128_f32[1], tempN.m128_f32[2] }.normalized()));
+
+		// 移動方向を消してWorld行列の逆行列を計算
+		auto mat = input->worldMatrix;
+		mat.value.r[3] = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		DirectX::XMVECTOR determinant;
+		mat.value = DirectX::XMMatrixInverse(&determinant, mat.value);
+		mat.value = DirectX::XMMatrixTranspose(mat.value);
+		
+		auto tempN = DirectX::XMVector4Transform(DirectX::XMVectorSet(normal.x, normal.y, normal.z, normal.w), mat);
+		double NoL = Math::Saturate(Dot(-input->directionalLight, Vec3{ tempN.m128_f32[0], tempN.m128_f32[1], tempN.m128_f32[2] }.normalized()));
 		output->light = NoL * input->lightColor;
 	}
 
