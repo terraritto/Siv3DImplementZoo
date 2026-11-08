@@ -37,6 +37,14 @@ namespace TerakoyaRenderer::Shading
 
 		// ライトの計算をWorld空間でしておく
 		Vec4 normal{ input->normal, 1.0f };
+
+		// 移動方向を消してWorld行列の逆行列を計算
+		auto mat = input->worldMatrix;
+		mat.value.r[3] = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		DirectX::XMVECTOR determinant;
+		mat.value = DirectX::XMMatrixInverse(&determinant, mat.value);
+		mat.value = DirectX::XMMatrixTranspose(mat.value);
+
 		auto tempN = DirectX::XMVector4Transform(DirectX::XMVectorSet(normal.x, normal.y, normal.z, normal.w), input->worldMatrix);
 		output->worldNormal = Vec3{ tempN.m128_f32[0], tempN.m128_f32[1], tempN.m128_f32[2] };
 	}
@@ -53,7 +61,7 @@ namespace TerakoyaRenderer::Shading
 
 		auto input = std::static_pointer_cast<PhongPixelInput>(m_input);
 
-		double NoL = Abs(Dot(-input->directionalLight, input->normal));
+		double NoL = Math::Saturate(Dot(-input->directionalLight, input->normal));
 		(*m_image)[input->screenPos.y][input->screenPos.x] = ColorF({ NoL * input->lightColor,1.0 });
 	}
 }
